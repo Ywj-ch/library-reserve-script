@@ -7,7 +7,7 @@ import random
 
 # 设置日志记录
 logging.basicConfig(
-    filename="D:/Develop/Python/python_test1/reserve_seat.log",  # 设置日志文件路径
+    filename="E:\\VScodeProjects\\python_test1\\reserve_seat.log",  # 设置日志文件路径
     level=logging.INFO,  # 日志等级
     format="%(asctime)s - %(levelname)s - %(message)s",  # 日志格式
     filemode='a',  # 追加写入模式
@@ -32,19 +32,19 @@ headers = {
     "Referer": "https://libwx.hunnu.edu.cn/mobile/html/seat/seatquickbook.html",
     "Accept-Encoding": "gzip, deflate, br",
     "Accept-Language": "zh-CN,zh;q=0.9",
-    "Cookie": "ASP.NET_SessionId=lsmlbmz3o1is0wen2pd2a20e; cookie_unit_name=%e6%b9%96%e5%8d%97%e5%b8%88%e8%8c%83%e5%a4%a7%e5%ad%a6%e5%9b%be%e4%b9%a6%e9%a6%84; cookie_come_app=D935AE54952F16C1; cookie_come_timestamp=1735883621; cookie_come_sno=DAD084FF07CB0C559615A8774898B543BDD91BDADE4A1FCA; dt_cookie_user_name_remember=3A76B31CCB4E607689DB161097F0C475B33A1172D44AE9EB"
+    "Cookie": "ASP.NET_SessionId=oez4fst5uvriwohnk4uf4a3q; cookie_unit_name=%e6%b9%96%e5%8d%97%e5%b8%88%e8%8c%83%e5%a4%a7%e5%ad%a6%e5%9b%be%e4%b9%a6%e9%a6%86; cookie_come_app=D935AE54952F16C1; cookie_come_timestamp=1772543468; cookie_come_sno=DAD084FF07CB0C55E3B5D65B9CD37DED05544D25C0E76B2A; dt_cookie_user_name_remember=3A76B31CCB4E607689DB161097F0C475B33A1172D44AE9EB"
 }
 
 # 表单数据模板
 data_template = {
-    "code": "AF2D2FCC651B0748EE657B92EC48C8994285D1F738DE26D96FC687FEB56E919716CB6805F9903F6BFEF2B13F07A0373772D52AEEE21A7C704C9CE1999A544AC2",
+    "code": "637F5C6974337A230B5D40E209BD0510454FAF5176A4A4EFBC86A12929CE07CE8294C68852C6CE12C39A3DCDEB2B3E4370A89545629431ECD8CADF56A21F959B",
     "data_type": "seatDate",
     "seatdate": "today",
-    "datetime": "780,1350"
+    "datetime": "660,1350"
 }
 
 # 需要预约的座位列表
-seat_list = ["Z41N006", "Z41N005", "Z41N259"]
+seat_list = ["Z41N001", "Z405002", "Z41N259"]
 
 # 忽略警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -52,11 +52,16 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # 开始记录日志
 logging.info("程序开始执行")
 
-# 随机打乱座位顺序
-random.shuffle(seat_list)
-
 # 定义尝试次数
 attempts = 3
+
+target_time = datetime.datetime.combine(datetime.date.today(), datetime.time(7, 0, 2))
+while True:
+    now = datetime.datetime.now()
+    if now >= target_time:
+        logging.info("到达预约时间 07:00:00,开始发送请求")
+        break
+    time.sleep(0.5)
 
 for i in range(attempts):
     seat = seat_list[i]  # 从随机顺序中选择座位
@@ -84,8 +89,8 @@ for i in range(attempts):
 
         # 如果需要间隔时间
         if i < attempts - 1:
-            logging.info(f"等待 2 秒后再尝试下一次请求...")
-            time.sleep(2)
+            logging.info(f"等待 1 秒后再尝试下一次请求...")
+            time.sleep(1)
 
     except Exception as e:
         # 捕获异常并记录
