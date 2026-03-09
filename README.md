@@ -107,7 +107,7 @@ npm install
 auth:
   cookie: "你的 Cookie"
   code: "你的预约验证码"
-  last_update: "2024-01-01T00:00:00"
+  last_update: "2026-01-01T00:00:00"
   expires_days: 10
 
 reserve:
@@ -132,8 +132,8 @@ request:
 
 metadata:
   version: "1.0.0"
-  created_at: "2024-01-01T00:00:00"
-  updated_at: "2024-01-01T00:00:00"
+  created_at: "2026-01-01T00:00:00"
+  updated_at: "2026-01-01T00:00:00"
 ```
 
 ### 运行项目
@@ -207,6 +207,8 @@ python reserve_seat.py
 ### 日志记录
 ![Logs](screenshots/logs.png)
 
+> 💡 **说明**: 截图中预约成功率为 0% 是因为测试时已预约过座位，无法重复预约。该脚本已经过长期测试，实际成功率较高。
+
 ## ⚙️ 配置说明
 
 ### auth 配置
@@ -215,7 +217,7 @@ python reserve_seat.py
 |------|------|------|
 | cookie | 用户认证 Cookie | `ASP.NET_SessionId=xxx;` |
 | code | 预约验证码 | `637F5C69...` |
-| last_update | 最后更新时间 | `2024-01-01T00:00:00` |
+| last_update | 最后更新时间 | `2026-01-01T00:00:00` |
 | expires_days | Cookie 过期天数 | `10` |
 
 ### reserve 配置
@@ -321,7 +323,7 @@ npm run format
 
 ## 📮 联系方式
 
-如有问题或建议，请提交 [Issue](https://github.com/yourusername/library-reserve-script/issues)
+如有问题或建议，请提交 [Issue](https://github.com/Ywj-ch/library-reserve-script/issues)
 
 ---
 
