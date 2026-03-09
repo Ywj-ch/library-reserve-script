@@ -1,11 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #6366F1;
+  --color-secondary: #818CF8;
+  --color-cta: #10B981;
+  --color-bg: #F5F3FF;
+  --color-text: #1E1B4B;
+  --color-text-light: #475569;
+  
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-bg-hover: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: 15px;
+  
+  --transition-fast: 150ms;
+  --transition-normal: 200ms;
+  --transition-slow: 300ms;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+.dark {
+  --color-bg: #0F172A;
+  --color-text: #F1F5F9;
+  --color-text-light: #CBD5E1;
+  
+  --glass-bg: rgba(30, 41, 59, 0.85);
+  --glass-bg-hover: rgba(51, 65, 85, 0.9);
+  --glass-border: rgba(148, 163, 184, 0.25);
+}
+
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #F5F3FF 0%, #E0E7FF 50%, #C7D2FE 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--color-text);
+}
+
+.dark body,
+body.dark {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+  background-attachment: fixed;
+}
+
+@layer utilities {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-slow) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    background: var(--glass-bg-hover);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .dark .glass-card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(148, 163, 184, 0.1);
+  }
+
+  .dark .glass-card:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(148, 163, 184, 0.2);
+  }
+
+  .glass-input {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    transition: all var(--transition-normal) ease;
+  }
+
+  .glass-input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    outline: none;
+  }
+
+  .dark .glass-input {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: #F1F5F9;
+  }
+
+  .dark .glass-input:focus {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+
+  .dark .glass-input::placeholder {
+    color: #94A3B8;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+}
+
+/* ============================================
+   深色模式全局变量和覆盖（CubeMaster 方案）
+   ============================================ */
+[data-theme="dark"] {
+  /* 背景颜色 */
+  --dm-bg-page: #0f172a;
+  --dm-bg-card: #1e293b;
+  --dm-bg-hover: #334155;
+  --dm-bg-input: #0f172a;
+  --dm-bg-button: #1e293b;
+  --dm-bg-info: #1e293b;
+
+  /* 文字颜色 */
+  --dm-text-primary: #f8fafc;
+  --dm-text-secondary: #cbd5e1;
+  --dm-text-muted: #94a3b8;
+
+  /* 边框颜色 */
+  --dm-border: #334155;
+  --dm-border-light: #475569;
+
+  /* 玻璃拟态效果 */
+  --dm-glass-bg: rgba(30, 41, 59, 0.8);
+  --dm-glass-border: rgba(148, 163, 184, 0.2);
+}
+
+/* 深色模式：玻璃卡片 */
+[data-theme="dark"] .glass-card {
+  background: var(--dm-glass-bg) !important;
+  border-color: var(--dm-glass-border) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 深色模式：输入框 */
+[data-theme="dark"] .glass-input,
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] select {
+  background: var(--dm-bg-input) !important;
+  border-color: var(--dm-border) !important;
+  color: var(--dm-text-primary) !important;
+}
+
+[data-theme="dark"] .glass-input:disabled,
+[data-theme="dark"] input:disabled {
+  background: var(--dm-bg-card) !important;
+  color: var(--dm-text-muted) !important;
+}
+
+/* 深色模式：按钮 */
+[data-theme="dark"] button:not(.bg-primary):not(.bg-error) {
+  background: var(--dm-bg-button) !important;
+  border-color: var(--dm-border) !important;
+  color: var(--dm-text-primary) !important;
+}
+
+/* 深色模式：信息卡片（TimePicker） */
+[data-theme="dark"] .bg-gradient-to-r {
+  background: var(--dm-bg-info) !important;
+  background-image: none !important;
+  border-color: var(--dm-border) !important;
+}
+
+/* 深色模式：表格展开详情 */
+[data-theme="dark"] tr.bg-gray-50,
+[data-theme="dark"] tr.dark\:bg-slate-800,
+[data-theme="dark"] tr.dark\:bg-slate-900 {
+  background: var(--dm-bg-page) !important;
+}
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white\/60,
+[data-theme="dark"] .dark\:bg-slate-700 {
+  background: var(--dm-bg-card) !important;
+}
+
+/* 深色模式：文字颜色 */
+[data-theme="dark"] {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] label,
+[data-theme="dark"] div {
+  color: inherit;
+}
+
+[data-theme="dark"] .text-gray-900,
+[data-theme="dark"] .text-gray-800,
+[data-theme="dark"] .text-gray-700 {
+  color: var(--dm-text-primary) !important;
+}
+
+[data-theme="dark"] .text-gray-600,
+[data-theme="dark"] .text-gray-500 {
+  color: var(--dm-text-secondary) !important;
+}
+
+[data-theme="dark"] .text-gray-400 {
+  color: var(--dm-text-muted) !important;
+}
+
+/* 深色模式：保留特殊颜色（保持原有颜色，不继承文字色） */
+[data-theme="dark"] .text-primary {
+  color: #6366F1 !important;
+}
+
+[data-theme="dark"] .text-green-600,
+[data-theme="dark"] .text-green-500 {
+  color: #10B981 !important;
+}
+
+[data-theme="dark"] .text-red-600,
+[data-theme="dark"] .text-red-500 {
+  color: #EF4444 !important;
+}
+
+[data-theme="dark"] .text-yellow-500 {
+  color: #F59E0B !important;
+}
+
+/* 深色模式：SVG 图标颜色 */
+[data-theme="dark"] svg {
+  color: currentColor;
+}
+
+[data-theme="dark"] svg[class*="text-primary"] {
+  color: #6366F1 !important;
+}
+
+[data-theme="dark"] svg[class*="text-green"] {
+  color: #10B981 !important;
+}
+
+[data-theme="dark"] svg[class*="text-red"] {
+  color: #EF4444 !important;
+}
+
+/* 深色模式：Toast 弹窗 */
+[data-theme="dark"] [class*="bg-green-50"],
+[data-theme="dark"] [class*="bg-green-900"] {
+  background-color: rgba(20, 83, 45, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="bg-red-50"],
+[data-theme="dark"] [class*="bg-red-900"] {
+  background-color: rgba(127, 29, 29, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="bg-yellow-50"],
+[data-theme="dark"] [class*="bg-yellow-900"] {
+  background-color: rgba(120, 53, 15, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="bg-blue-50"],
+[data-theme="dark"] [class*="bg-blue-900"] {
+  background-color: rgba(30, 58, 138, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="text-green-900"],
+[data-theme="dark"] [class*="text-green-100"] {
+  color: #86efac !important;
+}
+
+[data-theme="dark"] [class*="text-red-900"],
+[data-theme="dark"] [class*="text-red-100"] {
+  color: #fca5a5 !important;
+}
+
+[data-theme="dark"] [class*="text-yellow-900"],
+[data-theme="dark"] [class*="text-yellow-100"] {
+  color: #fcd34d !important;
+}
+
+[data-theme="dark"] [class*="text-blue-900"],
+[data-theme="dark"] [class*="text-blue-100"] {
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] [class*="border-green-200"],
+[data-theme="dark"] [class*="border-green-700"] {
+  border-color: rgba(34, 197, 94, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="border-red-200"],
+[data-theme="dark"] [class*="border-red-700"] {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="border-yellow-200"],
+[data-theme="dark"] [class*="border-yellow-700"] {
+  border-color: rgba(234, 179, 8, 0.3) !important;
+}
+
+[data-theme="dark"] [class*="border-blue-200"],
+[data-theme="dark"] [class*="border-blue-700"] {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* 深色模式：body 背景 */
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%) !important;
 }

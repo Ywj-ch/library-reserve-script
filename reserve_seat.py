@@ -3,17 +3,43 @@ import datetime
 import urllib3
 import logging
 import time
+import json
+import uuid
 import requests
 from pathlib import Path
+from typing import List, Dict, Any, Optional
+
+class ReservationSession:
+    def __init__(self):
+        self.session_id = str(uuid.uuid4())[:8]
+        self.start_time: Optional[datetime.datetime] = None
+        self.end_time: Optional[datetime.datetime] = None
+        self.status: str = "pending"
+        self.seats: List[Dict[str, Any]] = []
+        self.details: List[str] = []
+        self.success_seat: Optional[str] = None
+    
+    def add_detail(self, message: str):
+        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+        self.details.append(f"[{timestamp}] {message}")
+    
+    def add_seat_attempt(self, seat_id: str, status_code: int, response_text: str, success: bool):
+        self.seats.append({
+            "seat_id": seat_id,
+            "status_code": status_code,
+            "response_text": response_text[:200],
+            "success": success
+        })
+        if success and self.status != "success":
+            self.status = "success"
+            self.success_seat = seat_id
 
 def load_config():
-    """加载配置文件"""
     config_path = Path(__file__).parent / "config.yaml"
     with open(config_path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 def setup_logging():
-    """配置日志系统"""
     log_dir = Path(__file__).parent / "logs"
     log_dir.mkdir(exist_ok=True)
     
@@ -25,25 +51,23 @@ def setup_logging():
         encoding='utf-8'
     )
 
-def wait_until_send_time(send_time: str):
-    """等待到发送时间"""
+def wait_until_send_time(send_time: str, session: ReservationSession):
     hour, minute, second = map(int, send_time.split(':'))
     target_time = datetime.datetime.combine(
         datetime.date.today(),
         datetime.time(hour, minute, second)
     )
     
-    logging.info(f"等待至 {send_time} 开始发送请求...")
+    session.add_detail(f"等待至 {send_time} 开始发送请求...")
     
     while True:
         now = datetime.datetime.now()
         if now >= target_time:
-            logging.info(f"到达预约时间 {send_time}，开始执行预约")
+            session.add_detail(f"到达预约时间 {send_time}，开始执行预约")
             break
         time.sleep(0.5)
 
-def send_reserve_request(config: dict, seat_id: str):
-    """发送预约请求"""
+def send_reserve_request(config: dict, seat_id: str, session: ReservationSession) -> bool:
     url = config['request']['url']
     
     headers = {
@@ -73,29 +97,71 @@ def send_reserve_request(config: dict, seat_id: str):
     }
     
     try:
-        logging.info(f"正在为座位 {seat_id} 进行预约...")
+        session.add_detail(f"正在为座位 {seat_id} 进行预约...")
         response = requests.post(url, headers=headers, data=data, verify=False)
         
-        logging.info(f"状态码: {response.status_code}")
-        logging.info(f"响应内容: {response.text}")
+        response_text = response.text
+        session.add_detail(f"座位 {seat_id} - 状态码: {response.status_code}")
         
-        return response
+        success = False
+        try:
+            json_response = response.json()
+            msg = json_response.get('msg', '')
+            session.add_detail(f"座位 {seat_id} - 响应: {msg}")
+            if '预约成功' in msg:
+                success = True
+                session.add_detail(f"座位 {seat_id} 预约成功!")
+        except:
+            session.add_detail(f"座位 {seat_id} - 响应解析失败")
+        
+        session.add_seat_attempt(seat_id, response.status_code, response_text, success)
+        return success
+        
     except Exception as e:
-        logging.error(f"预约请求失败: {e}")
-        raise
+        session.add_detail(f"座位 {seat_id} 请求异常: {e}")
+        session.add_seat_attempt(seat_id, 0, str(e), False)
+        return False
 
-def main():
-    """主函数"""
+def log_session(session: ReservationSession):
+    session_data = {
+        "session_id": session.session_id,
+        "start_time": session.start_time.isoformat() if session.start_time else None,
+        "end_time": session.end_time.isoformat() if session.end_time else None,
+        "status": session.status,
+        "seats": session.seats,
+        "details": session.details,
+        "success_seat": session.success_seat,
+        "total_attempts": len(session.seats)
+    }
+    
+    logging.info(f"RESERVE_SESSION: {json.dumps(session_data, ensure_ascii=False)}")
+
+def run_reservation(immediate: bool = False) -> Dict[str, Any]:
+    """
+    执行预约任务
+    
+    Args:
+        immediate: 是否立即执行（跳过等待时间）
+    
+    Returns:
+        包含执行结果的字典
+    """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     
     setup_logging()
-    logging.info("程序开始执行")
+    
+    session = ReservationSession()
+    session.start_time = datetime.datetime.now()
+    session.add_detail("程序开始执行" + (" (立即执行模式)" if immediate else ""))
     
     try:
         config = load_config()
-        logging.info("配置加载成功")
+        session.add_detail("配置加载成功")
         
-        wait_until_send_time(config['reserve']['send_time'])
+        if not immediate:
+            wait_until_send_time(config['reserve']['send_time'], session)
+        else:
+            session.add_detail("跳过等待，立即执行预约")
         
         seats = [seat for seat in config['reserve']['seats'] if seat['enabled']]
         max_attempts = min(len(seats), config['reserve']['retry']['max_attempts'])
@@ -103,24 +169,39 @@ def main():
         for i in range(max_attempts):
             seat = seats[i]
             
-            try:
-                send_reserve_request(config, seat['id'])
-                
-                current_time = datetime.datetime.now()
-                logging.info(f"任务执行时间：{current_time}")
-                
-                if i < max_attempts - 1:
-                    delay = config['reserve']['retry']['delay_seconds']
-                    logging.info(f"等待 {delay} 秒后再尝试下一次请求...")
-                    time.sleep(delay)
+            success = send_reserve_request(config, seat['id'], session)
             
-            except Exception as e:
-                logging.error(f"第 {i + 1} 次预约失败: {e}")
+            if success:
+                break
+            
+            if i < max_attempts - 1:
+                delay = config['reserve']['retry']['delay_seconds']
+                session.add_detail(f"等待 {delay} 秒后再尝试下一个座位...")
+                time.sleep(delay)
         
-        logging.info("程序执行结束")
-    
+        session.add_detail("程序执行结束")
+        
     except Exception as e:
-        logging.error(f"程序执行异常: {e}", exc_info=True)
+        session.status = "failure"
+        session.add_detail(f"程序执行异常: {e}")
+    
+    finally:
+        session.end_time = datetime.datetime.now()
+        if session.status == "pending":
+            session.status = "failure"
+        log_session(session)
+    
+    return {
+        "session_id": session.session_id,
+        "status": session.status,
+        "success_seat": session.success_seat,
+        "total_attempts": len(session.seats),
+        "details": session.details,
+        "seats": session.seats
+    }
+
+def main():
+    run_reservation(immediate=False)
 
 if __name__ == "__main__":
     main()

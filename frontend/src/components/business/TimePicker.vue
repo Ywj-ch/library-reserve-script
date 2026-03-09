@@ -1,38 +1,58 @@
 <template>
-  <Card title="⏰ 发送时间">
+  <Card>
+    <template #header>
+      <div class="flex items-center space-x-3">
+        <ClockIcon class="w-6 h-6 text-primary" />
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">发送时间</h3>
+      </div>
+    </template>
+
     <div class="space-y-4">
       <div class="flex items-center space-x-2">
         <div class="flex-1">
-          <label class="mb-2 block text-sm font-medium text-gray-700">预约时间</label>
+          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">预约时间</label>
           <div class="flex items-center space-x-2">
             <input
-              v-model.number="hours"
+              :value="String(hours).padStart(2, '0')"
+              @input="hours = Number(($event.target as HTMLInputElement).value)"
               type="number"
               min="0"
               max="23"
-              class="w-20 rounded-md border border-gray-300 px-3 py-2 text-center focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+              class="glass-input w-20 px-3 py-2 text-center text-lg font-medium dark:text-gray-100"
             />
-            <span class="text-lg font-medium">:</span>
+            <span class="text-2xl font-bold text-gray-400">:</span>
             <input
-              v-model.number="minutes"
+              :value="String(minutes).padStart(2, '0')"
+              @input="minutes = Number(($event.target as HTMLInputElement).value)"
               type="number"
               min="0"
               max="59"
-              class="w-20 rounded-md border border-gray-300 px-3 py-2 text-center focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+              class="glass-input w-20 px-3 py-2 text-center text-lg font-medium dark:text-gray-100"
             />
-            <span class="text-lg font-medium">:</span>
+            <span class="text-2xl font-bold text-gray-400">:</span>
             <input
-              v-model.number="seconds"
+              :value="String(seconds).padStart(2, '0')"
+              @input="seconds = Number(($event.target as HTMLInputElement).value)"
               type="number"
               min="0"
               max="59"
-              class="w-20 rounded-md border border-gray-300 px-3 py-2 text-center focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+              class="glass-input w-20 px-3 py-2 text-center text-lg font-medium dark:text-gray-100"
             />
           </div>
         </div>
       </div>
 
-      <div class="text-sm text-gray-600">下次预约时间: {{ formatTime(nextRun) }}</div>
+      <div class="rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-700 border border-blue-200/50 dark:border-slate-600 p-4">
+        <div class="flex items-center space-x-2 mb-2">
+          <InformationCircleIcon class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div class="font-semibold text-blue-900 dark:text-blue-200">当前设置</div>
+        </div>
+        <div class="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-3">{{ formattedTime }}</div>
+        <div class="flex items-center space-x-2 text-sm">
+          <CalendarIcon class="w-4 h-4 text-blue-700 dark:text-blue-300" />
+          <div class="text-blue-700 dark:text-blue-300">下次预约时间: {{ formatNextRun }}</div>
+        </div>
+      </div>
 
       <Button @click="handleSave" :loading="saving" variant="primary" class="w-full">
         保存时间设置
@@ -45,6 +65,7 @@
 import { ref, watch, computed } from 'vue'
 import Card from '../common/Card.vue'
 import Button from '../common/Button.vue'
+import { ClockIcon, InformationCircleIcon, CalendarIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
   sendTime: string
@@ -82,10 +103,23 @@ const formattedTime = computed(() => {
   return `${h}:${m}:${s}`
 })
 
-function formatTime(dateString?: string): string {
-  if (!dateString) return '未设置'
-  return new Date(dateString).toLocaleString('zh-CN')
-}
+const formatNextRun = computed(() => {
+  if (!props.nextRun) return '未设置'
+
+  const nextRunDate = new Date(props.nextRun)
+  const [h, m, s] = formattedTime.value.split(':').map(Number)
+
+  nextRunDate.setHours(h, m, s)
+
+  return nextRunDate.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
+})
 
 function handleSave() {
   emit('save', formattedTime.value)

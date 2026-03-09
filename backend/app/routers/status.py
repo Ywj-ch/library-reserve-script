@@ -15,13 +15,15 @@ async def get_status() -> Dict[str, Any]:
     """获取系统状态"""
     try:
         auth_config = config_service.get_auth_config()
+        reserve_config = config_service.get_reserve_config()
         log_stats = log_service.get_stats()
         
         config_valid = bool(auth_config.cookie and auth_config.code)
         
         today = datetime.now().date()
         tomorrow = today + timedelta(days=1)
-        next_run = datetime.combine(tomorrow, datetime.strptime("07:00:02", "%H:%M:%S").time())
+        send_time = reserve_config.send_time
+        next_run = datetime.combine(tomorrow, datetime.strptime(send_time, "%H:%M:%S").time())
         
         return {
             "success": True,

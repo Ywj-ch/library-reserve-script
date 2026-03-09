@@ -2,7 +2,11 @@ from pathlib import Path
 from typing import List, Optional
 from datetime import datetime
 import re
-from ..models.log import LogEntry, LogListResponse, LogStats, LogLevel, LogStatus, LogPagination
+import json
+from ..models.log import (
+    AggregatedLogEntry, LogListResponse, LogStats, 
+    LogLevel, LogStatus, LogPagination, SeatAttempt
+)
 
 
 class LogService:
@@ -11,35 +15,58 @@ class LogService:
         if not self.log_file_path.is_absolute():
             self.log_file_path = Path(__file__).parent.parent.parent.parent / log_file_path
     
-    def parse_log_line(self, line: str) -> Optional[LogEntry]:
-        pattern = r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (\w+) - (.+)'
+    def parse_aggregated_log(self, line: str) -> Optional[AggregatedLogEntry]:
+        pattern = r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (\w+) - RESERVE_SESSION: (.+)'
         match = re.match(pattern, line.strip())
         
         if not match:
             return None
         
-        timestamp_str, level_str, message = match.groups()
+        timestamp_str, level_str, json_str = match.groups()
         timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S,%f').isoformat()
-        level = LogLevel(level_str)
         
-        seat = None
-        status = None
-        
-        if '预约成功' in message or '成功' in message:
-            status = LogStatus.SUCCESS
-            seat_match = re.search(r'座位\s+(\w+)', message)
-            if seat_match:
-                seat = seat_match.group(1)
-        elif '预约失败' in message or '失败' in message or '异常' in message:
-            status = LogStatus.FAILURE
-        
-        return LogEntry(
-            timestamp=timestamp,
-            level=level,
-            message=message,
-            seat=seat,
-            status=status
-        )
+        try:
+            data = json.loads(json_str)
+            
+            seats = []
+            for seat_data in data.get('seats', []):
+                seats.append(SeatAttempt(
+                    seat_id=seat_data.get('seat_id', ''),
+                    status_code=seat_data.get('status_code', 0),
+                    response_text=seat_data.get('response_text', ''),
+                    success=seat_data.get('success', False)
+                ))
+            
+            status_str = data.get('status', 'pending')
+            status = LogStatus.SUCCESS if status_str == 'success' else (
+                LogStatus.FAILURE if status_str == 'failure' else LogStatus.PENDING
+            )
+            
+            success_seat = data.get('success_seat')
+            total_attempts = data.get('total_attempts', len(seats))
+            
+            if success_seat:
+                message = f"预约成功 - 座位 {success_seat}"
+            elif seats:
+                failed_seats = ', '.join([s.seat_id for s in seats])
+                message = f"预约失败 - 尝试座位: {failed_seats}"
+            else:
+                message = "无座位尝试记录"
+            
+            return AggregatedLogEntry(
+                session_id=data.get('session_id', ''),
+                timestamp=timestamp,
+                start_time=data.get('start_time'),
+                end_time=data.get('end_time'),
+                status=status,
+                seats=seats,
+                details=data.get('details', []),
+                success_seat=success_seat,
+                total_attempts=total_attempts,
+                message=message
+            )
+        except (json.JSONDecodeError, KeyError) as e:
+            return None
     
     def get_logs(
         self,
@@ -57,7 +84,7 @@ class LogService:
         all_logs = []
         with open(self.log_file_path, 'r', encoding='utf-8') as f:
             for line in f:
-                log_entry = self.parse_log_line(line)
+                log_entry = self.parse_aggregated_log(line)
                 if log_entry:
                     all_logs.append(log_entry)
         
@@ -65,7 +92,7 @@ class LogService:
             all_logs = [log for log in all_logs if date_filter in log.timestamp]
         
         if status_filter:
-            all_logs = [log for log in all_logs if log.status and log.status.value == status_filter]
+            all_logs = [log for log in all_logs if log.status.value == status_filter]
         
         all_logs.reverse()
         
@@ -95,8 +122,8 @@ class LogService:
         
         with open(self.log_file_path, 'r', encoding='utf-8') as f:
             for line in f:
-                log_entry = self.parse_log_line(line)
-                if log_entry and log_entry.status:
+                log_entry = self.parse_aggregated_log(line)
+                if log_entry:
                     if log_entry.status == LogStatus.SUCCESS:
                         success_count += 1
                         if last_success is None or log_entry.timestamp > last_success:

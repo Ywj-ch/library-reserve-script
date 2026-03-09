@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
@@ -7,10 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#0070f3',
-        success: '#50e3c2',
-        warning: '#ff9800',
-        error: '#e53935',
+        primary: '#6366F1',
+        secondary: '#818CF8',
+        success: '#10B981',
+        warning: '#F59E0B',
+        error: '#EF4444',
       }
     },
   },

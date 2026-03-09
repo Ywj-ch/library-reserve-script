@@ -2,9 +2,24 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>图书馆座位预约助手</title>
+    <script>
+      // 提前应用主题，避免闪烁（CubeMaster 方案）
+      (function() {
+        const THEME_KEY = 'library-reserve-theme'
+        const savedTheme = localStorage.getItem(THEME_KEY)
+        const html = document.documentElement
+        
+        if (savedTheme === 'dark') {
+          html.setAttribute('data-theme', 'dark')
+          html.classList.add('dark')
+        } else {
+          html.setAttribute('data-theme', 'light')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

@@ -14,6 +14,8 @@ async def get_config() -> Dict[str, Any]:
     """获取完整配置"""
     try:
         config = config_service.get_full_config()
+        auth_config = config_service.get_auth_config()
+        config['auth'] = auth_config.model_dump()
         return {
             "success": True,
             "data": config
