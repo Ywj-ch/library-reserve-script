@@ -164,7 +164,7 @@ def run_reservation(immediate: bool = False) -> Dict[str, Any]:
             session.add_detail("跳过等待，立即执行预约")
         
         seats = [seat for seat in config['reserve']['seats'] if seat['enabled']]
-        max_attempts = min(len(seats), config['reserve']['retry']['max_attempts'])
+        max_attempts = min(len(seats), 10)
         
         for i in range(max_attempts):
             seat = seats[i]

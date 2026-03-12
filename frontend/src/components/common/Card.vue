@@ -1,10 +1,12 @@
 <template>
   <div class="glass-card rounded-2xl">
-    <div v-if="hasHeader" class="border-b border-white/20 dark:border-gray-700/30 px-6 py-4">
+    <div v-if="hasHeader" class="border-b border-white/20 px-6 py-4 dark:border-gray-700/30">
       <div class="flex items-center justify-between">
         <div>
           <slot name="header">
-            <h3 v-if="title" class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ title }}</h3>
+            <h3 v-if="title" class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+              {{ title }}
+            </h3>
           </slot>
         </div>
         <slot name="actions" />

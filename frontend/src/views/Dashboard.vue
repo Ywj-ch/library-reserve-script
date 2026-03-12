@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen pt-24 pb-8 px-4">
-    <div class="max-w-7xl mx-auto space-y-6">
+  <div class="min-h-screen px-4 pb-8 pt-24">
+    <div class="mx-auto max-w-7xl space-y-6">
       <div
         v-if="alertMessage"
-        class="rounded-lg border-l-4 border-warning bg-yellow-50/90 dark:bg-yellow-900/20 backdrop-blur-sm p-4 dark:text-yellow-100"
+        class="rounded-lg border-l-4 border-warning bg-yellow-50/90 p-4 backdrop-blur-sm dark:bg-yellow-900/20 dark:text-yellow-100"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center">
-            <ExclamationTriangleIcon class="mr-3 w-8 h-8 text-warning" />
+            <ExclamationTriangleIcon class="mr-3 h-8 w-8 text-warning" />
             <span class="font-medium">{{ alertMessage }}</span>
           </div>
           <Button @click="showUpdateModal = true" variant="primary" size="sm"> 立即更新 </Button>
@@ -17,7 +17,10 @@
       <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
         <Card>
           <div class="text-center">
-            <CheckCircleIcon class="w-12 h-12 mx-auto mb-2" :class="statusColor === 'text-success' ? 'text-green-500' : 'text-yellow-500'" />
+            <CheckCircleIcon
+              class="mx-auto mb-2 h-12 w-12"
+              :class="statusColor === 'text-success' ? 'text-green-500' : 'text-yellow-500'"
+            />
             <div class="mb-1 text-sm text-gray-600 dark:text-gray-400">服务状态</div>
             <div class="text-lg font-semibold" :class="statusColor">
               {{ statusText }}
@@ -27,7 +30,7 @@
 
         <Card>
           <div class="text-center">
-            <ClockIcon class="w-12 h-12 mx-auto mb-2 text-primary" />
+            <ClockIcon class="mx-auto mb-2 h-12 w-12 text-primary" />
             <div class="mb-1 text-sm text-gray-600 dark:text-gray-400">下次运行</div>
             <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {{ formatNextRun }}
@@ -37,7 +40,7 @@
 
         <Card>
           <div class="text-center">
-            <ChartBarIcon class="w-12 h-12 mx-auto mb-2 text-primary" />
+            <ChartBarIcon class="mx-auto mb-2 h-12 w-12 text-primary" />
             <div class="mb-1 text-sm text-gray-600 dark:text-gray-400">成功率</div>
             <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {{ status?.uptime_info?.success_rate || 0 }}%
@@ -47,7 +50,7 @@
 
         <Card>
           <div class="text-center">
-            <PlayIcon class="w-12 h-12 mx-auto mb-2 text-primary" />
+            <PlayIcon class="mx-auto mb-2 h-12 w-12 text-primary" />
             <div class="mb-1 text-sm text-gray-600 dark:text-gray-400">手动执行</div>
             <Button
               @click="handleRunReserve"
@@ -74,6 +77,7 @@
 
         <TimePicker
           :send-time="config?.reserve?.send_time || '07:00:02'"
+          :datetime-range="config?.reserve?.datetime_range"
           :next-run="status?.next_run"
           :saving="saving"
           @save="handleTimeSave"
@@ -86,12 +90,15 @@
         <Card>
           <template #header>
             <div class="flex items-center space-x-3">
-              <ClipboardDocumentListIcon class="w-6 h-6 text-primary" />
+              <ClipboardDocumentListIcon class="h-6 w-6 text-primary" />
               <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">最近日志</h3>
             </div>
           </template>
           <template #actions>
-            <router-link to="/logs" class="text-sm text-primary hover:text-blue-700 dark:hover:text-blue-400">
+            <router-link
+              to="/logs"
+              class="text-sm text-primary hover:text-blue-700 dark:hover:text-blue-400"
+            >
               查看全部
             </router-link>
           </template>
@@ -99,16 +106,23 @@
             <div
               v-for="log in recentLogs"
               :key="log.timestamp"
-              class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/30 py-2 last:border-0"
+              class="flex items-center justify-between border-b border-gray-100 py-2 last:border-0 dark:border-gray-700/30"
             >
               <div class="flex-1">
                 <div class="text-sm dark:text-gray-200">{{ log.message }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(log.timestamp) }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ formatDate(log.timestamp) }}
+                </div>
               </div>
-              <CheckCircleIcon v-if="log.status === 'success'" class="w-5 h-5 text-green-500" />
-              <XCircleIcon v-else class="w-5 h-5 text-red-500" />
+              <CheckCircleIcon v-if="log.status === 'success'" class="h-5 w-5 text-green-500" />
+              <XCircleIcon v-else class="h-5 w-5 text-red-500" />
             </div>
-            <div v-if="recentLogs.length === 0" class="py-4 text-center text-gray-400 dark:text-gray-500">暂无日志</div>
+            <div
+              v-if="recentLogs.length === 0"
+              class="py-4 text-center text-gray-400 dark:text-gray-500"
+            >
+              暂无日志
+            </div>
           </div>
         </Card>
       </div>
@@ -164,8 +178,8 @@ import { useConfigStore } from '@/stores/config'
 import { useToast } from '@/composables/useToast'
 import { logsApi } from '@/api/logs'
 import { reserveApi } from '@/api/reserve'
-import type { LogEntry } from '@/types/log'
-import type { Seat } from '@/types/config'
+import type { AggregatedLogEntry } from '@/types/log'
+import type { Seat, DatetimeRange } from '@/types/config'
 import {
   CheckCircleIcon,
   ClockIcon,
@@ -186,7 +200,7 @@ const running = ref(false)
 const showUpdateModal = ref(false)
 const modalCookie = ref('')
 const modalCode = ref('')
-const recentLogs = ref<LogEntry[]>([])
+const recentLogs = ref<AggregatedLogEntry[]>([])
 const localSeats = ref<Seat[]>([])
 
 const alertMessage = computed(() => {
@@ -245,10 +259,10 @@ async function handleAuthTest() {
   }
 }
 
-async function handleTimeSave(time: string) {
+async function handleTimeSave(time: string, datetimeRange: DatetimeRange) {
   saving.value = true
   try {
-    await configStore.updateReserve(time, localSeats.value)
+    await configStore.updateReserve(time, localSeats.value, datetimeRange)
     toast.success('保存成功！')
   } catch (error) {
     toast.error('保存失败，请重试')
@@ -279,10 +293,10 @@ async function handleRunReserve() {
   try {
     const response = await reserveApi.runReserve()
     if (response.success) {
-      toast.success(response.message)
+      toast.success(response.message || '执行成功')
       await loadRecentLogs()
     } else {
-      toast.error(response.message)
+      toast.error(response.message || '执行失败')
     }
   } catch (error) {
     toast.error('执行失败，请检查配置')

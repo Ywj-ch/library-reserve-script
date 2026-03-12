@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Config } from '@/types/config'
+import type { Config, DatetimeRange } from '@/types/config'
 import type { SystemStatus } from '@/types/api'
 import { configApi } from '@/api/config'
 import { statusApi } from '@/api/status'
@@ -57,13 +57,14 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
-  async function updateReserve(sendTime: string, seats: any[]) {
+  async function updateReserve(sendTime: string, seats: any[], datetimeRange?: DatetimeRange) {
     try {
       loading.value = true
       error.value = null
       const response = await configApi.updateReserveConfig({
         send_time: sendTime,
         seats,
+        datetime_range: datetimeRange,
       })
       if (response.success) {
         await fetchConfig()

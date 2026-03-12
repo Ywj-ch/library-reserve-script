@@ -2,20 +2,22 @@
   <Card>
     <template #header>
       <div class="flex items-center space-x-3">
-        <LockClosedIcon class="w-6 h-6 text-primary" />
+        <LockClosedIcon class="h-6 w-6 text-primary" />
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">认证配置</h3>
       </div>
     </template>
-    
+
     <div class="space-y-4">
       <div>
-        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Cookie</label>
+        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >Cookie</label
+        >
         <div class="flex space-x-2">
           <input
             v-model="localCookie"
             :disabled="!editingCookie"
             type="text"
-            class="glass-input flex-1 px-3 py-2 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-slate-800 dark:text-gray-100"
+            class="glass-input flex-1 px-3 py-2 disabled:cursor-not-allowed disabled:bg-gray-100 dark:text-gray-100 dark:disabled:bg-slate-800"
             placeholder="输入 Cookie"
           />
           <Button @click="copyCookie" variant="secondary" size="md">复制</Button>
@@ -32,7 +34,7 @@
             v-model="localCode"
             :disabled="!editingCode"
             type="text"
-            class="glass-input flex-1 px-3 py-2 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-slate-800 dark:text-gray-100"
+            class="glass-input flex-1 px-3 py-2 disabled:cursor-not-allowed disabled:bg-gray-100 dark:text-gray-100 dark:disabled:bg-slate-800"
             placeholder="输入 Code"
           />
           <Button @click="copyCode" variant="secondary" size="md">复制</Button>
@@ -47,7 +49,9 @@
         <span v-if="daysRemaining <= 3" class="ml-2 font-medium text-warning">
           (剩余 {{ daysRemaining }} 天)
         </span>
-        <span v-else class="ml-2 text-gray-500 dark:text-gray-500"> (剩余 {{ daysRemaining }} 天) </span>
+        <span v-else class="ml-2 text-gray-500 dark:text-gray-500">
+          (剩余 {{ daysRemaining }} 天)
+        </span>
       </div>
 
       <div class="flex space-x-2">

@@ -10,17 +10,17 @@
         ]"
       >
         <div class="mr-3">
-          <CheckCircleIcon v-if="toast.type === 'success'" class="w-6 h-6" />
-          <XCircleIcon v-else-if="toast.type === 'error'" class="w-6 h-6" />
-          <ExclamationTriangleIcon v-else-if="toast.type === 'warning'" class="w-6 h-6" />
-          <InformationCircleIcon v-else class="w-6 h-6" />
+          <CheckCircleIcon v-if="toast.type === 'success'" class="h-6 w-6" />
+          <XCircleIcon v-else-if="toast.type === 'error'" class="h-6 w-6" />
+          <ExclamationTriangleIcon v-else-if="toast.type === 'warning'" class="h-6 w-6" />
+          <InformationCircleIcon v-else class="h-6 w-6" />
         </div>
         <div class="flex-1 text-sm font-medium">{{ toast.message }}</div>
         <button
           @click="removeToast(toast.id)"
-          class="ml-3 text-lg opacity-70 hover:opacity-100 transition-opacity"
+          class="ml-3 text-lg opacity-70 transition-opacity hover:opacity-100"
         >
-          <XMarkIcon class="w-5 h-5" />
+          <XMarkIcon class="h-5 w-5" />
         </button>
       </div>
     </TransitionGroup>
@@ -43,9 +43,12 @@ const toasts = computed(() => toastStore.toasts)
 const removeToast = toastStore.removeToast
 
 const toastClasses = {
-  success: 'bg-green-50/90 dark:bg-green-900/30 text-green-900 dark:text-green-100 border border-green-200 dark:border-green-700/50',
-  error: 'bg-red-50/90 dark:bg-red-900/30 text-red-900 dark:text-red-100 border border-red-200 dark:border-red-700/50',
-  warning: 'bg-yellow-50/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-200 dark:border-yellow-700/50',
+  success:
+    'bg-green-50/90 dark:bg-green-900/30 text-green-900 dark:text-green-100 border border-green-200 dark:border-green-700/50',
+  error:
+    'bg-red-50/90 dark:bg-red-900/30 text-red-900 dark:text-red-100 border border-red-200 dark:border-red-700/50',
+  warning:
+    'bg-yellow-50/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-200 dark:border-yellow-700/50',
   info: 'bg-blue-50/90 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 border border-blue-200 dark:border-blue-700/50',
 }
 </script>

@@ -12,7 +12,7 @@ export const useThemeStore = defineStore('theme', () => {
     // 从 localStorage 读取或从 DOM 获取已应用的主题
     const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null
     const htmlTheme = document.documentElement.getAttribute('data-theme') as Theme | null
-    
+
     if (htmlTheme) {
       theme.value = htmlTheme
     } else if (savedTheme) {
@@ -32,10 +32,10 @@ export const useThemeStore = defineStore('theme', () => {
 
   function applyTheme(newTheme: Theme) {
     const html = document.documentElement
-    
+
     // 设置 data-theme 属性（用于 CSS 变量方案）
     html.setAttribute('data-theme', newTheme)
-    
+
     // 同时设置 dark 类名（用于 Tailwind）
     if (newTheme === 'dark') {
       html.classList.add('dark')

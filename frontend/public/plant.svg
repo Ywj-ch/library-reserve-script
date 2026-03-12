@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200" width="150" height="200">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="potGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8DCC8"/>
+      <stop offset="50%" style="stop-color:#D4A373"/>
+      <stop offset="100%" style="stop-color:#B8845C"/>
+    </linearGradient>
+    
+    <linearGradient id="stemGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A7023"/>
+      <stop offset="100%" style="stop-color:#6B8E23"/>
+    </linearGradient>
+    
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7FB069"/>
+      <stop offset="50%" style="stop-color:#6B8E23"/>
+      <stop offset="100%" style="stop-color:#5C8C4D"/>
+    </linearGradient>
+    
+    <linearGradient id="leafGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5C8C4D"/>
+      <stop offset="100%" style="stop-color:#4A7023"/>
+    </linearGradient>
+    
+    <!-- 滤镜 -->
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.15)"/>
+    </filter>
+    
+    <!-- 手绘纹理 -->
+    <pattern id="potTexture" patternUnits="userSpaceOnUse" width="12" height="12">
+      <circle cx="2" cy="2" r="1" fill="#A0826D" opacity="0.2"/>
+      <circle cx="8" cy="7" r="0.8" fill="#A0826D" opacity="0.15"/>
+    </pattern>
+  </defs>
+  
+  <!-- ===== 花盆 ===== -->
+  <g id="pot">
+    <ellipse cx="75" cy="175" rx="48" ry="25" fill="url(#potGrad)" stroke="#A0826D" stroke-width="2"/>
+    <ellipse cx="75" cy="175" rx="48" ry="25" fill="url(#potTexture)" opacity="0.3"/>
+    <ellipse cx="75" cy="148" rx="45" ry="10" fill="#E8DCC8" stroke="#A0826D" stroke-width="2"/>
+    <ellipse cx="75" cy="148" rx="45" ry="10" fill="url(#potTexture)" opacity="0.25"/>
+    <ellipse cx="60" cy="168" rx="15" ry="8" fill="white" opacity="0.1"/>
+  </g>
+  
+  <!-- ===== 土壤 ===== -->
+  <ellipse id="soil" cx="75" cy="146" rx="38" ry="8" fill="#5C4033"/>
+  
+  <!-- ===== 茎 ===== -->
+  <g id="stem-group">
+    <path id="stem-main" d="M 75 145 Q 72 120 75 100 Q 78 80 75 60" 
+          stroke="url(#stemGrad)" stroke-width="6" fill="none" 
+          stroke-linecap="round" filter="url(#softShadow)"/>
+  </g>
+  
+  <!-- ===== 龟背竹叶子组 ===== -->
+  <g id="plant-body">
+    <!-- 叶子1（左下，最大） -->
+    <g id="leaf1" class="plant-leaf" data-leaf="1">
+      <path class="leaf-stem" d="M 75 120 Q 55 110 40 95" 
+            stroke="url(#stemGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path class="leaf-blade" d="M 40 95 
+            Q 25 85 20 70 Q 18 60 25 55 Q 35 50 40 60
+            Q 45 50 50 55 Q 58 60 55 75
+            Q 60 65 65 70 Q 70 80 60 90
+            Q 55 100 40 95 Z" 
+            fill="url(#leafGrad)" stroke="#4A7023" stroke-width="1"/>
+      <!-- 叶子裂纹（龟背竹特征） -->
+      <path d="M 35 75 L 30 65" stroke="#4A7023" stroke-width="0.8" opacity="0.4"/>
+      <path d="M 45 70 L 48 60" stroke="#4A7023" stroke-width="0.8" opacity="0.4"/>
+      <path d="M 50 78 L 55 70" stroke="#4A7023" stroke-width="0.8" opacity="0.4"/>
+    </g>
+    
+    <!-- 叶子2（右上，中等） -->
+    <g id="leaf2" class="plant-leaf" data-leaf="2">
+      <path class="leaf-stem" d="M 75 90 Q 90 75 105 55" 
+            stroke="url(#stemGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path class="leaf-blade" d="M 105 55 
+            Q 115 45 120 50 Q 130 55 125 70
+            Q 132 65 135 75 Q 130 85 115 80
+            Q 110 90 100 85
+            Q 95 75 105 55 Z" 
+            fill="url(#leafGrad)" stroke="#4A7023" stroke-width="1"/>
+      <path d="M 115 65 L 120 58" stroke="#4A7023" stroke-width="0.6" opacity="0.4"/>
+      <path d="M 110 72 L 108 65" stroke="#4A7023" stroke-width="0.6" opacity="0.4"/>
+    </g>
+    
+    <!-- 叶子3（左上，中等） -->
+    <g id="leaf3" class="plant-leaf" data-leaf="3">
+      <path class="leaf-stem" d="M 75 75 Q 60 60 50 45" 
+            stroke="url(#stemGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path class="leaf-blade" d="M 50 45 
+            Q 40 35 35 40 Q 28 48 35 60
+            Q 28 58 25 68 Q 30 78 45 72
+            Q 50 65 50 45 Z" 
+            fill="url(#leafGrad)" stroke="#4A7023" stroke-width="1"/>
+      <path d="M 42 55 L 38 48" stroke="#4A7023" stroke-width="0.6" opacity="0.4"/>
+      <path d="M 38 62 L 34 55" stroke="#4A7023" stroke-width="0.6" opacity="0.4"/>
+    </g>
+    
+    <!-- 叶子4（右上，小） -->
+    <g id="leaf4" class="plant-leaf" data-leaf="4">
+      <path class="leaf-stem" d="M 75 65 Q 85 50 95 35" 
+            stroke="url(#stemGrad)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path class="leaf-blade" d="M 95 35 
+            Q 102 28 108 32 Q 115 38 110 50
+            Q 118 46 120 55 Q 115 62 102 58
+            Q 95 52 95 35 Z" 
+            fill="url(#leafGradDark)" stroke="#4A7023" stroke-width="1"/>
+      <path d="M 102 45 L 105 38" stroke="#4A7023" stroke-width="0.5" opacity="0.4"/>
+    </g>
+    
+    <!-- 叶子5（顶端，最小） -->
+    <g id="leaf5" class="plant-leaf" data-leaf="5">
+      <path class="leaf-stem" d="M 75 60 Q 73 45 75 30" 
+            stroke="url(#stemGrad)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path class="leaf-blade" d="M 75 30 
+            Q 68 22 65 28 Q 62 35 70 40
+            Q 78 35 82 28 Q 80 22 75 30 Z" 
+            fill="url(#leafGrad)" stroke="#4A7023" stroke-width="0.8"/>
+    </g>
+  </g>
+  
+  <!-- ===== 风效果（初始隐藏） ===== -->
+  <g id="wind-effect" opacity="0">
+    <path id="wind-line1" d="M -20 80 Q 30 85 80 78 Q 130 72 180 80" 
+          stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path id="wind-line2" d="M -15 100 Q 40 105 90 98 Q 140 92 185 100" 
+          stroke="rgba(255,255,255,0.4)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path id="wind-line3" d="M -25 60 Q 35 65 85 58 Q 135 52 175 60" 
+          stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- ===== 落叶占位（动态生成） ===== -->
+  <g id="falling-leaves"></g>
+</svg>

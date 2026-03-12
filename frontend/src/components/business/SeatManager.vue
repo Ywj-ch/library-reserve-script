@@ -2,7 +2,7 @@
   <Card>
     <template #header>
       <div class="flex items-center space-x-3">
-        <BuildingOffice2Icon class="w-6 h-6 text-primary" />
+        <BuildingOffice2Icon class="h-6 w-6 text-primary" />
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">座位列表</h3>
       </div>
     </template>
@@ -18,11 +18,11 @@
           <span class="font-semibold text-gray-900 dark:text-gray-100">{{ seat.id }}</span>
           <span class="text-sm text-gray-600 dark:text-gray-400">({{ seat.name }})</span>
           <span
-            :class="seat.enabled ? 'text-green-600' : 'text-gray-400'"
+            :class="seat.enabled ? 'text-green-600' : 'text-red-500'"
             class="flex items-center space-x-1 text-xs font-medium"
           >
-            <CheckCircleIcon v-if="seat.enabled" class="w-4 h-4" />
-            <XCircleIcon v-else class="w-4 h-4" />
+            <CheckCircleIcon v-if="seat.enabled" class="h-4 w-4" />
+            <XCircleIcon v-else class="h-4 w-4" />
             <span>{{ seat.enabled ? '启用' : '禁用' }}</span>
           </span>
         </div>
@@ -30,28 +30,28 @@
           <button
             @click="moveUp(index)"
             :disabled="index === 0"
-            class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            class="rounded-lg p-2 text-gray-600 transition-all hover:bg-white/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-white/10"
           >
-            <ArrowUpIcon class="w-4 h-4" />
+            <ArrowUpIcon class="h-4 w-4" />
           </button>
           <button
             @click="moveDown(index)"
             :disabled="index === modelValue.length - 1"
-            class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            class="rounded-lg p-2 text-gray-600 transition-all hover:bg-white/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-white/10"
           >
-            <ArrowDownIcon class="w-4 h-4" />
+            <ArrowDownIcon class="h-4 w-4" />
           </button>
           <button
             @click="toggleSeat(index)"
-            class="p-2 text-gray-600 dark:text-gray-400 hover:text-warning hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-all"
+            class="rounded-lg p-2 text-gray-600 transition-all hover:bg-white/50 hover:text-warning dark:text-gray-400 dark:hover:bg-white/10"
           >
-            <PowerIcon class="w-4 h-4" />
+            <PowerIcon class="h-4 w-4" />
           </button>
           <button
             @click="removeSeat(index)"
-            class="p-2 text-gray-600 dark:text-gray-400 hover:text-error hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-all"
+            class="rounded-lg p-2 text-gray-600 transition-all hover:bg-white/50 hover:text-error dark:text-gray-400 dark:hover:bg-white/10"
           >
-            <TrashIcon class="w-4 h-4" />
+            <TrashIcon class="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -88,6 +88,7 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline'
 import type { Seat } from '@/types/config'
+import { useToast } from '@/composables/useToast'
 
 interface Props {
   modelValue: Seat[]
@@ -103,6 +104,7 @@ const emit = defineEmits<{
   save: [seats: Seat[]]
 }>()
 
+const toast = useToast()
 const newSeatId = ref('')
 
 function moveUp(index: number) {
@@ -110,6 +112,7 @@ function moveUp(index: number) {
     const newSeats = [...props.modelValue]
     ;[newSeats[index - 1], newSeats[index]] = [newSeats[index], newSeats[index - 1]]
     emit('update:modelValue', newSeats)
+    toast.success(`${newSeats[index - 1].id} 已上移`)
   }
 }
 
@@ -118,6 +121,7 @@ function moveDown(index: number) {
     const newSeats = [...props.modelValue]
     ;[newSeats[index], newSeats[index + 1]] = [newSeats[index + 1], newSeats[index]]
     emit('update:modelValue', newSeats)
+    toast.success(`${newSeats[index + 1].id} 已下移`)
   }
 }
 
@@ -125,12 +129,16 @@ function toggleSeat(index: number) {
   const newSeats = [...props.modelValue]
   newSeats[index] = { ...newSeats[index], enabled: !newSeats[index].enabled }
   emit('update:modelValue', newSeats)
+  const action = newSeats[index].enabled ? '启用' : '禁用'
+  toast.info(`${newSeats[index].id} 已${action}`)
 }
 
 function removeSeat(index: number) {
   if (confirm('确定要删除这个座位吗？')) {
+    const seatId = props.modelValue[index].id
     const newSeats = props.modelValue.filter((_, i) => i !== index)
     emit('update:modelValue', newSeats)
+    toast.success(`${seatId} 已删除`)
   }
 }
 
@@ -142,6 +150,7 @@ function addSeat() {
       enabled: true,
     }
     emit('update:modelValue', [...props.modelValue, newSeat])
+    toast.success(`${newSeat.id} 已添加`)
     newSeatId.value = ''
   }
 }

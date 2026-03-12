@@ -1,20 +1,12 @@
 <template>
   <button
     @click="toggleTheme"
-    class="relative p-2 rounded-lg glass-card hover:scale-105 transition-all duration-200"
+    class="glass-card relative rounded-lg p-2 transition-all duration-200 hover:scale-105"
     :title="theme === 'light' ? '切换到暗色模式' : '切换到亮色模式'"
   >
     <transition name="theme-icon" mode="out-in">
-      <SunIcon
-        v-if="theme === 'dark'"
-        key="sun"
-        class="w-5 h-5 text-yellow-400"
-      />
-      <MoonIcon
-        v-else
-        key="moon"
-        class="w-5 h-5 text-primary"
-      />
+      <SunIcon v-if="theme === 'dark'" key="sun" class="h-5 w-5 text-yellow-400" />
+      <MoonIcon v-else key="moon" class="h-5 w-5 text-primary" />
     </transition>
   </button>
 </template>

@@ -11,13 +11,18 @@ export interface AuthConfig {
   days_remaining: number
 }
 
+export interface DatetimeRange {
+  start: string
+  end: string
+}
+
 export interface ReserveConfig {
   send_time: string
   seats: Seat[]
   retry: {
-    max_attempts: number
     delay_seconds: number
   }
+  datetime_range?: DatetimeRange
 }
 
 export interface Config {

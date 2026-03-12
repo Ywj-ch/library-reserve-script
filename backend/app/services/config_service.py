@@ -40,6 +40,16 @@ class ConfigService:
     
     def get_reserve_config(self) -> ReserveConfig:
         reserve_data = self.yaml_handler.get_section('reserve')
+        
+        if 'datetime_range' not in reserve_data:
+            request_data = self.yaml_handler.get_section('request')
+            datetime_str = request_data.get('data_template', {}).get('datetime', '660,1350')
+            start_minutes, end_minutes = map(int, datetime_str.split(','))
+            reserve_data['datetime_range'] = {
+                'start': f"{start_minutes // 60:02d}:{start_minutes % 60:02d}",
+                'end': f"{end_minutes // 60:02d}:{end_minutes % 60:02d}"
+            }
+        
         return ReserveConfig(**reserve_data)
     
     def update_reserve_config(self, reserve_update: ReserveConfigUpdate) -> ReserveConfig:
@@ -50,6 +60,22 @@ class ConfigService:
         
         if reserve_update.seats is not None:
             current_config.seats = reserve_update.seats
+        
+        if reserve_update.datetime_range is not None:
+            current_config.datetime_range = reserve_update.datetime_range
+            
+            start_parts = reserve_update.datetime_range.start.split(':')
+            end_parts = reserve_update.datetime_range.end.split(':')
+            start_minutes = int(start_parts[0]) * 60 + int(start_parts[1])
+            end_minutes = int(end_parts[0]) * 60 + int(end_parts[1])
+            
+            config = self.yaml_handler.read()
+            if 'request' not in config:
+                config['request'] = {}
+            if 'data_template' not in config['request']:
+                config['request']['data_template'] = {}
+            config['request']['data_template']['datetime'] = f"{start_minutes},{end_minutes}"
+            self.yaml_handler.write(config)
         
         self.yaml_handler.update_section('reserve', current_config.model_dump())
         
